@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse, Http404
 
 posts = [
     {
@@ -43,6 +44,8 @@ posts = [
     },
 ]
 
+posts_by_id = {post['id']: post for post in posts}
+
 
 def index(request):
     template = 'blog/index.html'
@@ -50,10 +53,20 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, id):
+# def get_post(posts, id):
+#     for post in posts:
+#         if post['id'] == id:
+#             return post
+
+
+def post_detail(request, post_id):
     template = 'blog/detail.html'
-    context = {'post': posts[id]}
-    return render(request, template, context)
+    if post_id in posts_by_id.keys():
+        post = posts_by_id[post_id]
+        context = {'post': post}
+        return render(request, template, context)
+    else:
+        raise Http404(f'Нет поста со значением id {post_id}')
 
 
 def category_posts(request, category_slug):
